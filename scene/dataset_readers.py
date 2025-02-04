@@ -325,6 +325,7 @@ def load_camera(meta, poses, path, llffhold):
     cam_infos = []
 
     for num_id, frame in enumerate(meta["frames"]):
+
         trans = poses[num_id].numpy()
         # not keep_original_world_coordinate
         trans[2, :] *= -1
@@ -339,7 +340,8 @@ def load_camera(meta, poses, path, llffhold):
 
         im = str(im).split("/")[1]
 
-        image_path = os.path.join(path, frame["file_path"])
+        image_path = os.path.join(
+            path, frame["file_path"])  #.replace("images", "seg_images")
 
         image = Image.open(image_path)
         height, width = np.asarray(image).shape[:2]
@@ -382,17 +384,28 @@ def load_camera(meta, poses, path, llffhold):
     nerf_normalization = getNerfppNorm(train_cam_infos)
 
     import open3d as o3d
-    point_cloud = o3d.io.read_point_cloud(os.path.join(path,
-                                                       "point_cloud.ply"))
-    colors = np.asarray(point_cloud.colors)
-    xyz = np.asarray(point_cloud.points)
 
+    # point_cloud = o3d.io.read_point_cloud(os.path.join(path,
+    #                                                    "point_cloud.ply"))
+    # colors = np.asarray(point_cloud.colors)
+    # xyz = np.asarray(point_cloud.points)
+
+    # pcd = BasicPointCloud(points=xyz,
+    #                       colors=colors,
+    #                       normals=np.zeros((len(xyz), 3)))
+
+    num_pts = 100_000
+    print(f"Generating random point cloud ({num_pts})...")
+
+    # We create random points inside the bounds of the synthetic Blender scenes
+    xyz = np.random.random((num_pts, 3)) * 10
+    shs = np.random.random((num_pts, 3)) / 255.0
     pcd = BasicPointCloud(points=xyz,
-                          colors=colors,
-                          normals=np.zeros((len(xyz), 3)))
+                          colors=SH2RGB(shs),
+                          normals=np.zeros((num_pts, 3)))
 
     ply_path = os.path.join(path, 'input_points.ply')
-    storePly(ply_path, xyz, colors * 255)
+    storePly(ply_path, xyz, shs * 255)
 
     scene_info = SceneInfo(point_cloud=pcd,
                            train_cameras=train_cam_infos,

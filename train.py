@@ -264,15 +264,17 @@ def training_report(tb_writer, iteration, Ll1, loss, l1_loss, elapsed,
                                            0.0, 1.0)
                     if tb_writer and (idx < 5):
                         from utils.general_utils import colormap
-                        depth = render_pkg["surf_depth"]
-                        norm = depth.max()
-                        depth = depth / norm
-                        depth = colormap(depth.cpu().numpy()[0], cmap='turbo')
-                        tb_writer.add_images(
-                            config['name'] +
-                            "_view_{}/depth".format(viewpoint.image_name),
-                            depth[None],
-                            global_step=iteration)
+                        # depth = render_pkg["surf_depth"]
+                        # import pdb
+                        # pdb.set_trace()
+                        # norm = depth.max()
+                        # depth = depth / norm
+                        # depth = colormap(depth.cpu().numpy()[0], cmap='turbo')
+                        # tb_writer.add_images(
+                        #     config['name'] +
+                        #     "_view_{}/depth".format(viewpoint.image_name),
+                        #     depth[None],
+                        #     global_step=iteration)
                         tb_writer.add_images(
                             config['name'] +
                             "_view_{}/render".format(viewpoint.image_name),

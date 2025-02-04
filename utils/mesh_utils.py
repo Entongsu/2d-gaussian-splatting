@@ -14,10 +14,25 @@ import numpy as np
 import os
 import math
 from tqdm import tqdm
-from utils.render_utils import save_img_f32, save_img_u8
+# from utils.render_utils import save_img_f32, save_img_u8
 from functools import partial
 import open3d as o3d
 import trimesh
+from PIL import Image
+
+
+def save_img_u8(img, pth):
+    """Save an image (probably RGB) in [0, 1] to disk as a uint8 PNG."""
+    with open(pth, 'wb') as f:
+        Image.fromarray((np.clip(np.nan_to_num(img), 0., 1.) * 255.).astype(
+            np.uint8)).save(f, 'PNG')
+
+
+def save_img_f32(depthmap, pth):
+    """Save an image (probably a depthmap) to disk as a float32 TIFF."""
+    with open(pth, 'wb') as f:
+        Image.fromarray(np.nan_to_num(depthmap).astype(np.float32)).save(
+            f, 'TIFF')
 
 
 def post_process_mesh(mesh, cluster_to_keep=1000):
